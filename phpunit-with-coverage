@@ -1,0 +1,41 @@
+#!/usr/bin/env php
+<?php declare(strict_types=1);
+/*
+ * This file is part of PHPUnit.
+ *
+ * (c) Sebastian Bergmann <sebastian@phpunit.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+require __DIR__ . '/src/bootstrap.php';
+
+use SebastianBergmann\CodeCoverage\Filter;
+use SebastianBergmann\CodeCoverage\CodeCoverage;
+use SebastianBergmann\CodeCoverage\Report\Html\Facade as HtmlReport;
+use SebastianBergmann\CodeCoverage\Report\CloverReport;
+use PHPUnit\Runner\Version;
+
+$filter = new Filter;
+$filter->addDirectoryToWhitelist(__DIR__ . '/src');
+$filter->removeFileFromWhitelist(__DIR__ . '/src/Framework/Assert/Functions.php');
+$filter->removeFileFromWhitelist(__DIR__ . '/src/Util/PHP/eval-stdin.php');
+
+$coverage = new CodeCoverage(null, $filter);
+$coverage->setProcessUncoveredFilesFromWhitelist(true);
+$coverage->start('PHPUnit Test Suite');
+
+PHPUnit\TextUI\Command::main(false);
+
+$coverage->stop();
+
+if (getenv('PHPUNIT_TOTAL_COVERAGE_CLOVER')) {
+    $report = new CloverReport;
+    $report->process($coverage, getenv('PHPUNIT_TOTAL_COVERAGE_CLOVER'));
+}
+
+if (getenv('PHPUNIT_TOTAL_COVERAGE_HTML')) {
+    $report = new HtmlReport(50, 90, \sprintf(' and <a href="https://phpunit.de/">PHPUnit %s</a>', Version::id()));
+    $report->process($coverage, getenv('PHPUNIT_TOTAL_COVERAGE_HTML'));
+}
