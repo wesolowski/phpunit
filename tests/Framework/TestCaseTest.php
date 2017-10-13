@@ -194,13 +194,46 @@ class Framework_TestCaseTest extends PHPUnit_Framework_TestCase
 
     public function testExceptionWithEmptyMessage()
     {
-        $test = new ThrowExceptionTestCase('test');
+        $test = new ThrowExceptionWithoutMessageTestCase('test');
         $test->expectException(RuntimeException::class, '');
+        $test->expectExceptionMessage('');
 
         $result = $test->run();
 
         $this->assertCount(1, $result);
         $this->assertTrue($result->wasSuccessful());
+    }
+
+    public function testExceptionErrorWithEmptyExceptionMessage()
+    {
+        $test = new ThrowExceptionTestCase('test');
+        $test->expectException(RuntimeException::class, '');
+        $test->expectExceptionMessage('');
+
+        $result = $test->run();
+
+        $this->assertEquals(1, $result->failureCount());
+        $this->assertCount(1, $result);
+        $this->assertEquals(
+            "Failed asserting that exception message 'A runtime error occurred' contains ''.",
+            $test->getStatusMessage()
+        );
+    }
+
+    public function testExceptionErrorWithEmptyMessage()
+    {
+        $test = new ThrowExceptionWithoutMessageTestCase('test');
+        $test->expectException(RuntimeException::class, '');
+        $test->expectExceptionMessage('A runtime error occurred');
+
+        $result = $test->run();
+
+        $this->assertEquals(1, $result->failureCount());
+        $this->assertCount(1, $result);
+        $this->assertEquals(
+            "Failed asserting that exception message '' contains 'A runtime error occurred'.",
+            $test->getStatusMessage()
+        );
     }
 
     public function testExceptionWithNullMessage()
