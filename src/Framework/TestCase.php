@@ -1085,8 +1085,7 @@ abstract class PHPUnit_Framework_TestCase extends PHPUnit_Framework_Assert imple
                     )
                 );
 
-                if (is_string($this->expectedExceptionMessage) &&
-                    !empty($this->expectedExceptionMessage)) {
+                if (is_string($this->expectedExceptionMessage))) {
                     $this->assertThat(
                         $e,
                         new PHPUnit_Framework_Constraint_ExceptionMessage(

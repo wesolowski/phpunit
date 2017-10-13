@@ -34,7 +34,14 @@ class PHPUnit_Framework_Constraint_ExceptionMessage extends PHPUnit_Framework_Co
      */
     protected function matches($other)
     {
-        return strpos($other->getMessage(), $this->expectedMessage) !== false;
+        $isMatches = false;
+        if (!empty($other->getMessage()) && !empty($this->expectedMessage)) {
+            $isMatches = strpos($other->getMessage(), $this->expectedMessage) !== false;
+        } elseif ($other->getMessage() === $this->expectedMessage) {
+            $isMatches = true;
+        }
+
+        return $isMatches;
     }
 
     /**
